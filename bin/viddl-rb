@@ -1,0 +1,43 @@
+#!/usr/bin/env ruby
+$LOAD_PATH << File.join(File.dirname(__FILE__), '..', 'helper')  # general helpers
+$LOAD_PATH << File.join(File.dirname(__FILE__), 'helper')  	     # bin-specific helpers
+
+require "rubygems"
+require "nokogiri"
+require "cgi"
+require "open-uri"
+require "open3"
+require "optparse"
+require "driver.rb"
+require "downloader.rb"
+require "download-helper.rb"
+require "parameter-parser.rb"
+require "plugin-helper.rb"
+require "audio-helper.rb"
+require "utility-helper.rb"
+
+begin
+  # params is a hash with keys for each of the parameters passed in.
+  # see helper/parameter-parser.rb for what those keys are.
+  params = ParameterParser.parse_app_parameters(ARGV)
+
+  puts "Loading Plugins"
+  ViddlRb::UtilityHelper.load_plugins
+  puts "Plugins loaded: #{ViddlRb::PluginBase.registered_plugins.inspect}"
+
+  puts "Will try to extract audio: #{params[:extract_audio] == true}."
+  puts "Analyzing URL: #{params[:url]}"
+
+  app = Driver.new(params)   
+  app.start                  # starts the download process
+
+rescue OptionParser::ParseError, ViddlRb::RequirementError => e
+  puts "Error: #{e.message}"
+  exit(1)
+
+rescue StandardError => e
+  puts "Error: #{e.message}"
+  puts "\nBacktrace:"
+  puts e.backtrace
+  exit(1)
+end
