@@ -41,11 +41,11 @@ module ViddlRb
 
     def self.make_shellsafe_path(path)
       # JRuby cannot open some paths that are escaped with Shellwords.escape so this is a workaround.
-      if jruby?
-        '"' + path + '"'
-      else
-        Shellwords.escape(path)
-      end
+      #if jruby?
+      #  '"' + path + '"'
+      #else
+      Shellwords.escape(path)
+      #end
     end
 
     def self.base_path
